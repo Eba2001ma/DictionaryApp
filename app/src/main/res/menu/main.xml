@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/english_oromo_1"
+        android:title=""
+        app:showAsAction="always"
+        tools:ignore="HardcodedText">
+        <menu>
+            <item
+                android:id="@+id/action_eng_oro"
+                android:title="English-Oromo"
+                android:icon="@drawable/english_oromo"
+                android:orderInCategory="100"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/action_oro_eng"
+                android:title="Oromo-English"
+                android:icon="@drawable/oromo_english"
+                android:orderInCategory="100"
+                app:showAsAction="never"/>
+        </menu>
+    </item>
+</menu>
