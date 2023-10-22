@@ -1,5 +1,8 @@
 package com.example.elelleedictionary;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -99,6 +103,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.main, menu);
         menuSetting = menu.findItem(R.id.action_settings);
 
+        // Find the NavigationView and retrieve the rate and share menu items
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu navMenu = navigationView.getMenu();
+        MenuItem menuRate = navMenu.findItem(R.id.nav_rate);
+        MenuItem menuShare = navMenu.findItem(R.id.nav_share);
+
+        // Set the visibility of rate and share options
+        menuRate.setVisible(true);
+        menuShare.setVisible(true);
+
+        // Add click listeners to rate and share options
+        menuRate.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                openAppRating();
+                return true;
+            }
+        });
+
+        menuShare.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                shareApp();
+                return true;
+            }
+        });
+
+
         String id = Global.getState(this, "dic_type");
         if (id!=null)
             onOptionsItemSelected(menu.findItem(Integer.valueOf(id)));
@@ -108,9 +140,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
-
+/*
     @Override public boolean onOptionsItemSelected (MenuItem item){
-        int id = item.getItemId();
+       int id = item.getItemId();
 
         if (R.id.action_settings==id)return true;
         Global.saveState(this, "dic_type", String.valueOf(id));
@@ -130,6 +162,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         return super.onOptionsItemSelected(item);
     }
+  */
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // Handle the settings action
+            return true;
+        } else if (id == R.id.nav_rate) {
+            // Handle the rate action
+            openAppRating();
+            return true;
+        } else if (id == R.id.nav_share) {
+            // Handle the share action
+            shareApp();
+            return true;
+        }
+
+        Global.saveState(this, "dic_type", String.valueOf(id));
+
+        ArrayList<String> source = dbHelper.getWord(id);
+        if (id == R.id.action_eng_oro) {
+            dictionaryFragment.resetDataSource(source);
+            menuSetting.setIcon(getDrawable(R.drawable.english_oromo_1));
+        } else if (id == R.id.action_oro_eng) {
+            dictionaryFragment.resetDataSource(source);
+            menuSetting.setIcon(getDrawable(R.drawable.oromo_english_1));
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void openAppRating() {
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent rateIntent = new Intent(Intent.ACTION_VIEW, uri);
+        try {
+            startActivity(rateIntent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "Could not open Play Store", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareApp() {
+        String appUrl = "https://play.google.com/store/apps/details?id=" + getPackageName();
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out this awesome app: " + appUrl);
+        startActivity(Intent.createChooser(shareIntent, "Share via"));
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
